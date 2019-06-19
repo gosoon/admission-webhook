@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admission-webhook
+  namespace: eks-system
+  labels:
+    app: admission-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admission-webhook
+  template:
+    metadata:
+      labels:
+        app: admission-webhook
+    spec:
+      containers:
+      - name: admission-webhook
+        image: admission-webhook:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8443
+          name: admission-webhook-api
+        volumeMounts:
+        - name: webhook-tls-certs
+          mountPath: "/etc/kubernetes/pki"
+          readOnly: true
+      volumes:
+      - name: webhook-tls-certs
+        secret:
+          secretName: admission-webhook-secrets 
+          items:
+          - key: crt
+            path: admission-webhook-tls.crt
+          - key: key
+            path: admission-webhook-tls.key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admission-webhook
+  namespace: eks-system
+spec:
+  selector:
+    app: admission-webhook
+  ports:
+    - port: 443
+      targetPort: webhook-api
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: demo-webhook
+webhooks:
+  - name: admission-webhook.eks-system.svc
+    failurePolicy: Fail
+    clientConfig:
+      service:
+        name: admission-webhook
+        namespace: eks-system
+        path: "/mutating-pods"
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN1akNDQWFJQ0NRQ1N6N1krOGYreHVEQU5CZ2txaGtpRzl3MEJBUXNGQURBZk1SMHdHd1lEVlFRRERCUmgKWkcxcGMzTnBiMjR0ZDJWaWFHOXZheUJEUVRBZUZ3MHhPVEEyTVRnd09UVXlNemxhRncweE9UQTNNVGd3T1RVeQpNemxhTUI4eEhUQWJCZ05WQkFNTUZHRmtiV2x6YzJsdmJpMTNaV0pvYjI5cklFTkJNSUlCSWpBTkJna3Foa2lHCjl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUE0ZUhjWDRiVEFvUGdFekZqWEJ4WG93RnlpeWtVNDRQSmNJVVoKdytGcVphNG5weDRCZWZGTXBSY0VRYmZUZmhZQkRPejlnTW1hZGxDVjhSVVl3RFh6a012UFY5YWVOY29td2lBdgo4aEprcUJBKzk0WXJLN3gxS3BUM01IS0dZL1VMWmIrU3prTVpQcldTVEpBNGJFSHN1c0ZTZ1gvYWNKWmF0c2tRCktGQVBSYlljR3B0MHFpZFM2UjhPSzdmSHJjQmRsRU9WdFN0eE5FN0hZRjBWQTBNL3FQQXcyRlAyZVBPNE1aM3YKbEhnUlFSSWdXdE40YVY2aHA3ck5jUEYwRkhidFB1b3ZyUEFWdmFKNTJXMGk0UVk3MmhoNXhML3Z1d1RzYTZPcgpWaUZaRGplRXFyd0F5SzM2T3RYTzdmWUlSVWxFQmtrbCs0ZjZ4c1ZNRysvQ2QxSlAxUUlEQVFBQk1BMEdDU3FHClNJYjNEUUVCQ3dVQUE0SUJBUUJrRjl2TGVZWlFKQXV4TS9WcmY5VHlLTjFUaDh5R0xZZGwvN2p3NGlmekYvY1EKcU5oZ0tVeXdOb21DaUttZmp5dzdSeEFmcFlMVklOTHBBYzJ4Q3QrM0psQlBQV3VNRUFjOVRFOUdjaVZJOXVYMwpkODEwS1hqUksrRUtqRFNZZWZSWjFqNmlIRkErLzJRVW5TV0JIODdQeEpCb2VnM2RaMHQ4QWZNUW1KZ3A2ZmhhCkdMU25nYjdFN0pHUDBIMkR2TlZrYVQ1YXZKMFptRzR6ZGo5VllvcGtaRkZIQWRFalEwT2E3WWhZMHFuYjBuTEkKRm1vdWQza2pkem40Y01TeFgyalJGeDRra1FwVm9MNmZNUkZ2MktIR2NTekRpVGwyaVdPRjFhZDk5WmxSRC9BUApGU3pHUjZra1NUMGZzMnQ2b1FFWnN2SEJaRGhxcmE0R0RRK2NHN2QwCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K 
+    rules:
+      - operations: [ "CREATE" ]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
