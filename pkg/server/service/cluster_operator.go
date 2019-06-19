@@ -1,0 +1,79 @@
+/*
+Copyright 2018 The Kubernetes Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package service
+
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+
+	"github.com/gosoon/glog"
+	"k8s.io/api/admission/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	eksv1 "git.yun.pingan.com/eks/cluster-operator/pkg/apis/eks/v1"
+)
+
+const (
+	Version  = "v1"
+	Resource = "WorkloadCluster"
+	Group    = "eks.yun.pingan.com"
+)
+
+// AdmitClusterOperator is check all args.
+func AdmitClusterOperator(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
+	glog.Info("admitting clusteroperator")
+
+	workloadClusterResource := metav1.GroupVersionResource{Group: Group, Version: Version, Resource: Resource}
+	if ar.Request.Resource != workloadClusterResource {
+		err := fmt.Errorf("expect resource to be %s", workloadClusterResource)
+		glog.Error(err)
+		return ToAdmissionResponse(err)
+	}
+
+	raw := ar.Request.Object.Raw
+	workloadCluster := eksv1.WorkloadCluster{}
+
+	if err := json.Unmarshal(raw, &workloadCluster); err != nil {
+		glog.Error(err)
+		return ToAdmissionResponse(err)
+	}
+	reviewResponse := v1beta1.AdmissionResponse{}
+	reviewResponse.Allowed = true
+
+	// verify spec
+	var msg string
+	if len(workloadCluster.Spec.Cluster.Masters) == 0 {
+		reviewResponse.Allowed = false
+		msg += "masters is nil,plz check"
+	}
+
+	if len(workloadCluster.Spec.Cluster.Workers) == 0 {
+		reviewResponse.Allowed = false
+		msg += "work node is nil,plz check"
+	}
+
+	if len(workloadCluster.Spec.Cluster.PrivateSSHKey) == 0 && len(workloadCluster.Spec.Cluster.RootPassword) == 0 {
+		reviewResponse.Allowed = false
+		msg += "private ssh key and root passwd is nil,plz check"
+	}
+
+	if !reviewResponse.Allowed {
+		reviewResponse.Result = &metav1.Status{Message: strings.TrimSpace(msg)}
+	}
+	return &reviewResponse
+}

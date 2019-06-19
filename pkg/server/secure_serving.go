@@ -75,48 +75,12 @@ func serve(w http.ResponseWriter, r *http.Request, admit admitFunc) {
 	}
 }
 
-//func serveAddLabel(w http.ResponseWriter, r *http.Request) {
-//serve(w, r, addLabel)
-//}
-
-func servePods(w http.ResponseWriter, r *http.Request) {
-	serve(w, r, service.AdmitPods)
+func serveClusterOperator(w http.ResponseWriter, r *http.Request) {
+	serve(w, r, service.AdmitClusterOperator)
 }
-
-func serveMutatePods(w http.ResponseWriter, r *http.Request) {
-	serve(w, r, service.MutatePods)
-}
-
-func serveConfigmaps(w http.ResponseWriter, r *http.Request) {
-	serve(w, r, service.AdmitConfigMaps)
-}
-
-func serveMutateConfigmaps(w http.ResponseWriter, r *http.Request) {
-	serve(w, r, service.MutateConfigmaps)
-}
-
-//func serveCustomResource(w http.ResponseWriter, r *http.Request) {
-//serve(w, r, service.AdmitCustomResource)
-//}
-
-//func serveMutateCustomResource(w http.ResponseWriter, r *http.Request) {
-//serve(w, r, service.MutateCustomResource)
-//}
-
-//func serveCRD(w http.ResponseWriter, r *http.Request) {
-//serve(w, r, service.AdmitCRD)
-//}
 
 func RunServer(config configs.Config) error {
-	//http.HandleFunc("/add-label", serveAddLabel)
-	//http.HandleFunc("/pods/attach", serveAttachingPods)
-	//http.HandleFunc("/mutating-pods", serveMutatePods)
-	//http.HandleFunc("/configmaps", serveConfigmaps)
-	//http.HandleFunc("/mutating-configmaps", serveMutateConfigmaps)
-	//http.HandleFunc("/custom-resource", serveCustomResource)
-	//http.HandleFunc("/mutating-custom-resource", serveMutateCustomResource)
-	//http.HandleFunc("/crd", serveCRD)
-	http.HandleFunc("/pods", servePods)
+	http.HandleFunc("/eks/operator/cluster", serveClusterOperator)
 
 	server := &http.Server{
 		Addr:      ":8443",
