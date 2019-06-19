@@ -79,8 +79,18 @@ func serveClusterOperator(w http.ResponseWriter, r *http.Request) {
 	serve(w, r, service.AdmitClusterOperator)
 }
 
+func servePods(w http.ResponseWriter, r *http.Request) {
+	serve(w, r, service.AdmitPods)
+}
+
+func serveMutatePods(w http.ResponseWriter, r *http.Request) {
+	serve(w, r, service.MutatePods)
+}
+
 func RunServer(config configs.Config) error {
-	http.HandleFunc("/eks/operator/cluster", serveClusterOperator)
+	http.HandleFunc("/eks", serveClusterOperator)
+	http.HandleFunc("/pods", servePods)
+	http.HandleFunc("/mutating-pods", serveMutatePods)
 
 	server := &http.Server{
 		Addr:      ":8443",
