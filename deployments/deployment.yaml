@@ -54,7 +54,7 @@ metadata:
   name: admission-webhook
 webhooks:
   - name: admission-webhook.eks-system.svc
-    failurePolicy: Fail
+    failurePolicy: Ignore
     clientConfig:
       service:
         name: admission-webhook
