@@ -56,20 +56,32 @@ func AdmitClusterOperator(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse
 	reviewResponse.Allowed = true
 
 	// verify spec
-	var msg string
+	msg := "plz check,"
 	if len(workloadCluster.Spec.Cluster.Masters) == 0 {
 		reviewResponse.Allowed = false
-		msg += "masters is nil,plz check"
+		msg += "masters is nil "
+	} else {
+		master := workloadCluster.Spec.Cluster.Masters[0]
+		if len(master.IP) == 0 && len(master.Hostname) == 0 {
+			reviewResponse.Allowed = false
+			msg += "masters is nil "
+		}
 	}
 
 	if len(workloadCluster.Spec.Cluster.Workers) == 0 {
 		reviewResponse.Allowed = false
-		msg += "work node is nil,plz check"
+		msg += "work node is nil "
+	} else {
+		worker := workloadCluster.Spec.Cluster.Workers[0]
+		if len(worker.IP) == 0 && len(worker.Hostname) == 0 {
+			reviewResponse.Allowed = false
+			msg += "work node is nil "
+		}
 	}
 
 	if len(workloadCluster.Spec.Cluster.PrivateSSHKey) == 0 && len(workloadCluster.Spec.Cluster.RootPassword) == 0 {
 		reviewResponse.Allowed = false
-		msg += "private ssh key and root passwd is nil,plz check"
+		msg += "private ssh key and root passwd is nil "
 	}
 
 	if !reviewResponse.Allowed {

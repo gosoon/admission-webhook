@@ -65,7 +65,6 @@ webhooks:
       - operations:
         - CREATE
         - UPDATE
-        - DELETE
         apiGroups:
         - eks.yun.pingan.com
         apiVersions:
