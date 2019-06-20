@@ -88,7 +88,7 @@ func serveMutatePods(w http.ResponseWriter, r *http.Request) {
 }
 
 func RunServer(config configs.Config) error {
-	http.HandleFunc("/eks", serveClusterOperator)
+	http.HandleFunc("/eks/operator/cluster", serveClusterOperator)
 	http.HandleFunc("/pods", servePods)
 	http.HandleFunc("/mutating-pods", serveMutatePods)
 

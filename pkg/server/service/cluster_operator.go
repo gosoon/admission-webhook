@@ -30,7 +30,7 @@ import (
 
 const (
 	Version  = "v1"
-	Resource = "WorkloadCluster"
+	Resource = "workloadclusters"
 	Group    = "eks.yun.pingan.com"
 )
 
