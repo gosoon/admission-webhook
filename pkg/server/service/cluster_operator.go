@@ -97,12 +97,14 @@ func AdmitClusterOperator(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse
 		}
 		currentMasters := workloadCluster.Spec.Cluster.Masters
 		oldMasters := oldWorkloadCluster.Spec.Cluster.Masters
-		if len(currentMasters) == 0 || len(oldMasters) == 0 {
+		if len(oldMasters) == 0 {
 			reviewResponse.Allowed = false
 			msg += "masters is nil."
-		} else if currentMasters[0].IP != oldMasters[0].IP {
-			reviewResponse.Allowed = false
-			msg += "the old master is different from the current master."
+		} else {
+			if currentMasters[0].IP != oldMasters[0].IP {
+				reviewResponse.Allowed = false
+				msg += "the old master is different from the current master."
+			}
 		}
 	}
 
