@@ -32,6 +32,10 @@ const (
 	Version  = "v1"
 	Resource = "workloadclusters"
 	Group    = "eks.yun.pingan.com"
+
+	CREATE = "CREATE"
+	UPDATE = "UPDATE"
+	DELETE = "DELETE"
 )
 
 // AdmitClusterOperator is check all args.
@@ -59,29 +63,47 @@ func AdmitClusterOperator(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse
 	msg := "plz check,"
 	if len(workloadCluster.Spec.Cluster.Masters) == 0 {
 		reviewResponse.Allowed = false
-		msg += "masters is nil "
+		msg += "masters is nil."
 	} else {
 		master := workloadCluster.Spec.Cluster.Masters[0]
 		if len(master.IP) == 0 && len(master.Hostname) == 0 {
 			reviewResponse.Allowed = false
-			msg += "masters is nil "
+			msg += "masters is nil."
 		}
 	}
 
 	if len(workloadCluster.Spec.Cluster.Workers) == 0 {
 		reviewResponse.Allowed = false
-		msg += "work node is nil "
+		msg += "work node is nil."
 	} else {
 		worker := workloadCluster.Spec.Cluster.Workers[0]
 		if len(worker.IP) == 0 && len(worker.Hostname) == 0 {
 			reviewResponse.Allowed = false
-			msg += "work node is nil "
+			msg += "work node is nil."
 		}
 	}
 
 	if len(workloadCluster.Spec.Cluster.PrivateSSHKey) == 0 && len(workloadCluster.Spec.Cluster.RootPassword) == 0 {
 		reviewResponse.Allowed = false
-		msg += "private ssh key and root passwd is nil "
+		msg += "private ssh key and root passwd is nil."
+	}
+
+	if ar.Request.Operation == UPDATE {
+		oldWorkloadCluster := eksv1.WorkloadCluster{}
+		oldRaw := ar.Request.OldObject.Raw
+		if err := json.Unmarshal(oldRaw, &oldWorkloadCluster); err != nil {
+			glog.Error(err)
+			return ToAdmissionResponse(err)
+		}
+		currentMasters := workloadCluster.Spec.Cluster.Masters
+		oldMasters := oldWorkloadCluster.Spec.Cluster.Masters
+		if len(currentMasters) == 0 || len(oldMasters) == 0 {
+			reviewResponse.Allowed = false
+			msg += "masters is nil."
+		} else if currentMasters[0].IP != oldMasters[0].IP {
+			reviewResponse.Allowed = false
+			msg += "the old master is different from the current master."
+		}
 	}
 
 	if !reviewResponse.Allowed {

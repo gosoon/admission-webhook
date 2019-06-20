@@ -58,6 +58,22 @@ func TestAdmitClusterOperator(t *testing.T) {
 		},
 	}
 
+	// create
+	for idx, test := range testCases {
+		test.APIVersion = "eks.yun.pingan.com/v1"
+		test.Kind = "WorkloadCluster"
+		test.Name = fmt.Sprintf("test-%v", idx)
+
+		w, _ := json.Marshal(test)
+		ar.Request.Object.Raw = w
+
+		ap := AdmitClusterOperator(ar)
+		if !reflect.DeepEqual(ap.Allowed, false) {
+			t.Logf("except ,got %v,err is %v", ap.Allowed, ap.Result.Message)
+		}
+	}
+	// update
+	ar.Request.Operation = "UPDATE"
 	for idx, test := range testCases {
 		test.APIVersion = "eks.yun.pingan.com/v1"
 		test.Kind = "WorkloadCluster"
