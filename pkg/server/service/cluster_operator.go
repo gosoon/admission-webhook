@@ -97,6 +97,7 @@ func AdmitClusterOperator(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse
 		}
 		currentMasters := workloadCluster.Spec.Cluster.Masters
 		oldMasters := oldWorkloadCluster.Spec.Cluster.Masters
+		glog.Info("master and old master:", currentMasters, oldMasters)
 		if len(oldMasters) == 0 {
 			reviewResponse.Allowed = false
 			msg += "masters is nil."
