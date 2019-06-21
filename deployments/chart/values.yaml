@@ -13,8 +13,8 @@ volumeMounts:
 replicaCount: 3
 
 image:
-  repository: nginx
-  tag: stable
+  repository: harbor.pingan.zonesan.me/eks-system/admission-webhook
+  tag: latest
   pullPolicy: Always
 
 imagePullSecrets: []

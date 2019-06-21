@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/gosoon/glog"
@@ -38,6 +39,12 @@ const (
 	UPDATE = "UPDATE"
 	DELETE = "DELETE"
 )
+
+type vmNodeList []eksv1.VmNode
+
+func (n vmNodeList) Len() int           { return len(n) }
+func (n vmNodeList) Less(i, j int) bool { return n[i].IP < n[j].IP }
+func (n vmNodeList) Swap(i, j int)      { n[i], n[j] = n[j], n[i] }
 
 // AdmitClusterOperator is check all args.
 func AdmitClusterOperator(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
@@ -98,6 +105,9 @@ func AdmitClusterOperator(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse
 		}
 		currentMasters := workloadCluster.Spec.Cluster.Masters
 		oldMasters := oldWorkloadCluster.Spec.Cluster.Masters
+
+		sort.Sort(vmNodeList(currentMasters))
+		sort.Sort(vmNodeList(oldMasters))
 		glog.Info("master and old master:", currentMasters, oldMasters)
 
 		if !reflect.DeepEqual(currentMasters, oldMasters) {
