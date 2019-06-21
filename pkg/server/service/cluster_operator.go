@@ -19,6 +19,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/gosoon/glog"
@@ -98,14 +99,10 @@ func AdmitClusterOperator(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse
 		currentMasters := workloadCluster.Spec.Cluster.Masters
 		oldMasters := oldWorkloadCluster.Spec.Cluster.Masters
 		glog.Info("master and old master:", currentMasters, oldMasters)
-		if len(oldMasters) == 0 {
+
+		if !reflect.DeepEqual(currentMasters, oldMasters) {
 			reviewResponse.Allowed = false
-			msg += "masters is nil."
-		} else {
-			if currentMasters[0].IP != oldMasters[0].IP {
-				reviewResponse.Allowed = false
-				msg += "the old master is different from the current master."
-			}
+			msg += "the old master is different from the current master."
 		}
 	}
 
