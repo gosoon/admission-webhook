@@ -18,7 +18,7 @@ spec:
       containers:
       - name: admission-webhook
         image: admission-webhook:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 8443
           name: webhook-api
