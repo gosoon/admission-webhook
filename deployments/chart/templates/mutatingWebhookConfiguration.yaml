@@ -3,7 +3,7 @@ kind: MutatingWebhookConfiguration
 metadata:
   name: admission-webhook
 webhooks:
-  - name: admission-webhook.eks-system.svc
+  - name: admission-webhook.ecs-system.svc
     failurePolicy: {{ .Values.mutatingWebhookConfiguration.webhook.failurePolicy }}
     clientConfig:
       service:
@@ -16,8 +16,8 @@ webhooks:
         - CREATE
         - UPDATE
         apiGroups:
-        - eks.yun.pingan.com
+        - ecs.yun.com
         apiVersions:
         - v1
         resources:
-        - workloadclusters
+        - kubernetesclusters

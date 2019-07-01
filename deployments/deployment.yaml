@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: admission-webhook
-  namespace: eks-system
+  namespace: ecs-system
   labels:
     app: admission-webhook
 spec:
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: admission-webhook
-        image: harbor.pingan.zonesan.me/eks-system/admission-webhook:latest
+        image: ecs-system/admission-webhook:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8443
@@ -40,7 +40,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: admission-webhook
-  namespace: eks-system
+  namespace: ecs-system
 spec:
   selector:
     app: admission-webhook
@@ -53,21 +53,21 @@ kind: MutatingWebhookConfiguration
 metadata:
   name: admission-webhook
 webhooks:
-  - name: admission-webhook.eks-system.svc
+  - name: admission-webhook.ecs-system.svc
     failurePolicy: Ignore
     clientConfig:
       service:
         name: admission-webhook
-        namespace: eks-system
-        path: /eks/operator/cluster
+        namespace: ecs-system
+        path: /ecs/operator/cluster
       caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFVENDQWZtZ0F3SUJBZ0lKQUp5VUx1K09pT09vTUEwR0NTcUdTSWIzRFFFQkN3VUFNQjh4SFRBYkJnTlYKQkFNTUZHRmtiV2x6YzJsdmJpMTNaV0pvYjI5cklFTkJNQjRYRFRFNU1EWXhPREF6TkRVMU9Gb1hEVEU1TURjeApPREF6TkRVMU9Gb3dIekVkTUJzR0ExVUVBd3dVWVdSdGFYTnphVzl1TFhkbFltaHZiMnNnUTBFd2dnRWlNQTBHCkNTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDdUZvMHZja0VZZ0s2WkJjWGpQSWVtWnlmME94dVIKd2lTNVZmeW4yR2pFdDBrWTl6dHhRWm5UNkNFdytmM3BhaVZwQVN1bEVObjVzSVpyN2dDTHlLdE9DRzk4SWlUcwpKczR3V3NPVUVPWlc1bWdzZkpJM2h6MGEvVU1RSU04b3liQWVkSGtDN0s1UXc3OFlIblp0NXpNUzZPTEc0NVBxCkJXMUZYcVlYbm84ZFRIWDdaSG1vQjBxc0tRQTZlcSs2QW8rdkNXZXFzUW5lTG81OW93VDQ4YUlLVUJ2SlAxdEgKS09pQ01rdmVaOFd5YkNIQWExSS8yUWIwNXQ4YmRERitvdEozay9lOEM5V2k3KzFSSlNsRkFscGIyK3V1Qis3LworWkRMVnpSc1JzRGF2SzZHMjd3Um5wYUF1ejRxeHRRSGZtODlQWklFZmpBajZNZmR6VUlBOTdJMUFnTUJBQUdqClVEQk9NQjBHQTFVZERnUVdCQlNvT0hyZzNTKzNYbFVqZnVBeHFwOGpvQ2lUd1RBZkJnTlZIU01FR0RBV2dCU28KT0hyZzNTKzNYbFVqZnVBeHFwOGpvQ2lUd1RBTUJnTlZIUk1FQlRBREFRSC9NQTBHQ1NxR1NJYjNEUUVCQ3dVQQpBNElCQVFDQ2FSOHRQMGpMSFV5UHNwbDZaOEJGeXNBSVE2b0NsN1p4amFhYWFRNmlQRjJXdmlqQUExT1V1M2drCkhXRXhCbVpNY2ZhTnEwMEwwc2VCK3gzMnV3N2xnNFkwMmh6MVlocWsvZHdROGpTb0JKQ0xOSVVTYUs1SzRnc1cKRHVpOWQvSDlBV0FDMUdESXZENE9oZytBOFgzeGxzNXdWdUEyNjlpcTMzd1hKdVBsQlZsY3NtV0F2aXFDQzZncApJandpQnNTOGRML1VxQkh6OHQxcDBGUHJpRmlTYmZ1MXhwRzBRYkNzVjIyaVdvRkdnS2h6d20vVkxJcXNiUUNmCkJhb2tnNk10M2gyelkyOWJXWk5JeUl0a0lmT21yNTRERVpsSHZrSDljbGxBd2lobzg1VDBTRXRHL25XR01OYnIKMERRdUYyalRjOXUwNEpNR3ZPeHRVMUNIYjVqdQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
     rules:
       - operations:
         - CREATE
         - UPDATE
         apiGroups:
-        - eks.yun.pingan.com
+        - ecs.yun.com
         apiVersions:
         - v1
         resources:
-        - workloadclusters
+        - kubernetesclusters

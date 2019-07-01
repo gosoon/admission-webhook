@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	eksv1 "git.yun.pingan.com/eks/cluster-operator/pkg/apis/eks/v1"
+	ecsv1 "git.yun.pingan.com/ecs/cluster-operator/pkg/apis/ecs/v1"
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -19,12 +19,12 @@ func TestAdmitClusterOperator(t *testing.T) {
 		},
 		Request: &v1beta1.AdmissionRequest{
 			Kind: metav1.GroupVersionKind{
-				Group:   "eks.yun.pingan.com",
+				Group:   "ecs.yun.pingan.com",
 				Version: "v1",
 				Kind:    "WorkloadCluster",
 			},
 			Resource: metav1.GroupVersionResource{
-				Group:    "eks.yun.pingan.com",
+				Group:    "ecs.yun.pingan.com",
 				Version:  "v1",
 				Resource: "workloadclusters",
 			},
@@ -32,19 +32,19 @@ func TestAdmitClusterOperator(t *testing.T) {
 		},
 	}
 
-	testCases := []eksv1.WorkloadCluster{
+	testCases := []ecsv1.WorkloadCluster{
 		{
-			//ObjectMeta: eksv1.ObjectMeta{
+			//ObjectMeta: ecsv1.ObjectMeta{
 			//Labels: map[string]string{"Allow": "false"},
 			//},
-			Spec: eksv1.WorkloadClusterSpec{
-				Cluster: eksv1.Cluster{
-					Masters: []eksv1.VmNode{
+			Spec: ecsv1.WorkloadClusterSpec{
+				Cluster: ecsv1.Cluster{
+					Masters: []ecsv1.VmNode{
 						{
 							IP: "10.8.215.6",
 						},
 					},
-					Workers: []eksv1.VmNode{
+					Workers: []ecsv1.VmNode{
 						{
 							IP: "10.8.215.6",
 						},
@@ -60,7 +60,7 @@ func TestAdmitClusterOperator(t *testing.T) {
 
 	// create
 	for idx, test := range testCases {
-		test.APIVersion = "eks.yun.pingan.com/v1"
+		test.APIVersion = "ecs.yun.pingan.com/v1"
 		test.Kind = "WorkloadCluster"
 		test.Name = fmt.Sprintf("test-%v", idx)
 
@@ -75,7 +75,7 @@ func TestAdmitClusterOperator(t *testing.T) {
 	// update
 	ar.Request.Operation = "UPDATE"
 	for idx, test := range testCases {
-		test.APIVersion = "eks.yun.pingan.com/v1"
+		test.APIVersion = "ecs.yun.pingan.com/v1"
 		test.Kind = "WorkloadCluster"
 		test.Name = fmt.Sprintf("test-%v", idx)
 

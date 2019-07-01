@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"git.yun.pingan.com/eks/admission-webhook/configs"
-	"git.yun.pingan.com/eks/admission-webhook/pkg/server/service"
+	"github.com/gosoon/admission-webhook/configs"
+	"github.com/gosoon/admission-webhook/pkg/server/service"
 
 	"github.com/gosoon/glog"
 	"k8s.io/api/admission/v1beta1"
@@ -88,7 +88,7 @@ func serveMutatePods(w http.ResponseWriter, r *http.Request) {
 }
 
 func RunServer(config configs.Config) error {
-	http.HandleFunc("/eks/operator/cluster", serveClusterOperator)
+	http.HandleFunc("/ecs/operator/cluster", serveClusterOperator)
 	http.HandleFunc("/pods", servePods)
 	http.HandleFunc("/mutating-pods", serveMutatePods)
 

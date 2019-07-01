@@ -1,4 +1,4 @@
-module git.yun.pingan.com/eks/admission-webhook
+module github.com/gosoon/admission-webhook
 
 go 1.12
 

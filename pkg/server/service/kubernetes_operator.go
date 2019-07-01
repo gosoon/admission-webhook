@@ -27,20 +27,20 @@ import (
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	eksv1 "git.yun.pingan.com/eks/cluster-operator/pkg/apis/eks/v1"
+	ecsv1 "github.com/gosoon/kubernetes-operator/pkg/apis/ecs/v1"
 )
 
 const (
 	Version  = "v1"
 	Resource = "workloadclusters"
-	Group    = "eks.yun.pingan.com"
+	Group    = "ecs.yun.pingan.com"
 
 	CREATE = "CREATE"
 	UPDATE = "UPDATE"
 	DELETE = "DELETE"
 )
 
-type vmNodeList []eksv1.VmNode
+type vmNodeList []ecsv1.VmNode
 
 func (n vmNodeList) Len() int           { return len(n) }
 func (n vmNodeList) Less(i, j int) bool { return n[i].IP < n[j].IP }
@@ -58,7 +58,7 @@ func AdmitClusterOperator(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse
 	}
 
 	raw := ar.Request.Object.Raw
-	workloadCluster := eksv1.WorkloadCluster{}
+	workloadCluster := ecsv1.WorkloadCluster{}
 
 	if err := json.Unmarshal(raw, &workloadCluster); err != nil {
 		glog.Error(err)
@@ -97,7 +97,7 @@ func AdmitClusterOperator(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse
 	}
 
 	if ar.Request.Operation == UPDATE {
-		oldWorkloadCluster := eksv1.WorkloadCluster{}
+		oldWorkloadCluster := ecsv1.WorkloadCluster{}
 		oldRaw := ar.Request.OldObject.Raw
 		if err := json.Unmarshal(oldRaw, &oldWorkloadCluster); err != nil {
 			glog.Error(err)

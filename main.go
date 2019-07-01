@@ -22,8 +22,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"git.yun.pingan.com/eks/admission-webhook/configs"
-	"git.yun.pingan.com/eks/admission-webhook/pkg/server"
+	"github.com/gosoon/admission-webhook/configs"
+	"github.com/gosoon/admission-webhook/pkg/server"
 
 	"github.com/gosoon/glog"
 )
